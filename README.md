@@ -22,19 +22,20 @@ Android Injection是关于Android平台上ptrace注入的一些小实践(主要�
 
 
 1. exercise1-interceptSystemCall/target是被注入的程序，该程序很简单，就是循环调用printf，如下所示。如果注入成功，那么printf输出的字符串就会反转。
-``` c
-int main()
-{
-	int count = 0;
-	while (1)
-	{
-		printf("Target is running:%d\n", count);
-		count++;
-		sleep(10);
-	}
-	return 0;
-}
-```
+
+  ``` c
+  int main()
+  {
+  	int count = 0;
+  	while (1)
+  	{
+  		printf("Target is running:%d\n", count);
+  		count++;
+  		sleep(10);
+  	}
+  	return 0;
+  }
+  ```
 * exercise1-interceptSystemCall/interceptSysCall是注入程序，用于拦截目标程序的系统调用write，并反转参数str。
 
 
@@ -42,32 +43,33 @@ int main()
 
 
 1. 在exercise1-interceptSystemCall/target/jni目录下打开终端，输入命令：
-```c
-ndk-build  // 编译
-python push.py  //将target push 到/data/local/tmp目录下
-```
+  
+  ```c
+  ndk-build  // 编译
+  python push.py  //将target push 到/data/local/tmp目录下
+  ```
 * 在exercise1-interceptSystemCall/interceptSysCall/jni目录下打开终端，输入命令：
-```c
-ndk-build //编译
-python push.py  //将interceptSysCall push 到/data/local/tmp目录下
-```
+  ```c
+  ndk-build //编译
+  python push.py  //将interceptSysCall push 到/data/local/tmp目录下
+  ```
 
 
 * 运行
 
 
 1. 运行target：在任意终端下输入如下命令：
-```c
-adb shell ./data/local/tmp/target
-```
+  ```c
+  adb shell ./data/local/tmp/target
+  ```
   得到如下结果:
 
   ![e1_r_before_injection](https://github.com/ManyFace/AndroidInjection/blob/master/images/1/1.png "e1_r1_before_injection")
 * 通过adb shell ps命令找到target的pid，假设为3940
 * 运行interceptSysCall：在任意终端下输入如下命令：
-```c
-adb shell ./data/local/tmp/interceptSysCall 3940 //3940为target的pid
-```
+  ```c
+  adb shell ./data/local/tmp/interceptSysCall 3940 //3940为target的pid
+  ```
   此时可以看到target的输出已经变化，如下所示，说明注入成功。
 
   ![e1_r_after_injection](https://github.com/ManyFace/AndroidInjection/blob/master/images/1/4.png "e1_r1_after_injection")
@@ -96,45 +98,45 @@ int hacked_method(int p)
   ![e2_ida](https://github.com/ManyFace/AndroidInjection/blob/master/images/2/4.png "e2_ida")
 
   因而可以通过覆盖0xCF8和0xCFA处的指令，修改函数的返回值，并让函数返回。这里覆盖的指令为：
-```c
-mov r0, #2  //设置函数的返回值为2
-mov pc, lr  //返回
-```
-这两条指令的二进制为shell_code="\x02\x20\xF7\x46"，（其实更严谨一点应该首先判断lr处的指令是arm还是thumb，然后修改
-状态寄存器和pc）libtarget.so在内存中的基址base_addr可以从/proc/pid/maps中获取，从而计算得到注入shell_code的地址为
-base_addr+offset。如果注入成功，那么hacked_method()的返回值就恒为2。
+  ```c
+  mov r0, #2  //设置函数的返回值为2
+  mov pc, lr  //返回
+  ```
+  这两条指令的二进制为shell_code="\x02\x20\xF7\x46"，（其实更严谨一点应该首先判断lr处的指令是arm还是thumb，然后修改
+  状态寄存器和pc）libtarget.so在内存中的基址base_addr可以从/proc/pid/maps中获取，从而计算得到注入shell_code的地址为
+  base_addr+offset。如果注入成功，那么hacked_method()的返回值就恒为2。
 
 
 - 编译
 
 
 1. 在exercise2-injectMethod/target/jni目录下打开终端，输入命令：
-```c
-ndk-build  // 编译
-python push.py  //将target push 到/data/local/tmp目录下
-```
+  ```c
+  ndk-build  // 编译
+  python push.py  //将target push 到/data/local/tmp目录下
+  ```
 * 在exercise2-injectMethod/injectTarget/jni目录下打开终端，输入命令：
-```c
-ndk-build //编译
-python push.py  //将injectTarget push 到/data/local/tmp目录下
-```
+  ```c
+  ndk-build //编译
+  python push.py  //将injectTarget push 到/data/local/tmp目录下
+  ```
 
 
 * 运行
 
 
 1. 运行target：在任意终端下输入如下命令：
-```c
-adb shell ./data/local/tmp/target
-```
+  ```c
+  adb shell ./data/local/tmp/target
+  ```
   得到如下结果:
 
   ![e2_r_before_injection](https://github.com/ManyFace/AndroidInjection/blob/master/images/2/1.PNG "e2_r_before_injection")
 * 通过adb shell ps命令找到target的pid，假设为8326
 * 运行injectTarget：在任意终端下输入如下命令：
-```c
-adb shell ./data/local/tmp/injectTarget 8326 //8326为target的pid
-```
+  ```c
+  adb shell ./data/local/tmp/injectTarget 8326 //8326为target的pid
+  ```
   此时可以看到target的输出已经变化，如下所示，说明注入成功。
 
   ![e2_r_after_injection](https://github.com/ManyFace/AndroidInjection/blob/master/images/2/3.PNG "e2_r_after_injection")
@@ -148,26 +150,25 @@ adb shell ./data/local/tmp/injectTarget 8326 //8326为target的pid
   ```c
   void show_msg()
   {
-  	char str1[] = "huluwa";
-  	char str2[] = "shejing";
-  	if (strlen(str1) > 3)
-  	{
-  		printf("str1=\"%s\" 's length > 3 \n", str1);
-  	} else
-  	{
-  		printf("str1=\"%s\" 's length <=3 \n", str2);
-  	}
+    char str1[] = "huluwa";
+    char str2[] = "shejing";
+    if (strlen(str1) > 3)
+    {
+      printf("str1=\"%s\" 's length > 3 \n", str1);
+    } else
+    {
+      printf("str1=\"%s\" 's length <=3 \n", str2);
+    }
 
-  	if (strcmp(str1, str2) == 0)
-  	{
-  		printf("str1=\"%s\" is equal to str2=\"%s\" \n\n", str1, str2);
-  	} else
-  	{
-  		printf("str1=\"%s\" is not equal to str2=\"%s\" \n\n", str1, str2);
-  	}
+    if (strcmp(str1, str2) == 0)
+    {
+      printf("str1=\"%s\" is equal to str2=\"%s\" \n\n", str1, str2);
+    } else
+    {
+      printf("str1=\"%s\" is not equal to str2=\"%s\" \n\n", str1, str2);
+    }
   }
   ```
-
 * exercise3-GOTHook/injectSo是注入的程序，它将exercise3-GOTHook/libhook动态链接库注入到target中，并调用exercise3-GOTHook/libhook的hook_init()函数获取libtarget.so中strlen()和strcmp()函数在GOT中的地址，最后修改GOT，将地址改为hook函数的地址，从而实现GOT Hook。
 
   strlen()对应的hook函数为int hook_strlen(char * str)，其定义如下：
@@ -186,7 +187,6 @@ adb shell ./data/local/tmp/injectTarget 8326 //8326为target的pid
   	return 0; //modify return value
   }
   ```
-
 * 如何执行注入so中的初始化函数
 
   在injectSo将so注入到target中后，可以通过dlsym()找到初始化函数的地址，然后设置相应的寄存器值来执行初始化函数。当然还有个相对简单的方法：在注入so中定义一个构造函数void before_main() \__attribute__((constructor))，通过IDA查看该so可以知道，before_main()函数是.init array section的一个元素，如下图所示。从而before_main()函数就会在用dlopen()加载该so的时候执行，但是before_main()不能有参数。
@@ -209,37 +209,37 @@ adb shell ./data/local/tmp/injectTarget 8326 //8326为target的pid
 
 
 1. 在exercise3-GOTHook/target/jni目录下打开终端，输入命令：
-```c
-ndk-build  // 编译
-python push.py  //将target push 到/data/local/tmp目录下
-```
+  ```c
+  ndk-build  // 编译
+  python push.py  //将target push 到/data/local/tmp目录下
+  ```
 * 在exercise3-GOTHook/libhook/jni目录下打开终端，输入命令：
-```c
-ndk-build //编译
-python push.py  //将libhook.so push 到/data/local/tmp目录下
-```
+  ```c
+  ndk-build //编译
+  python push.py  //将libhook.so push 到/data/local/tmp目录下
+  ```
 * 在exercise3-GOTHook/injectSo/jni目录下打开终端，输入命令：
-```c
-ndk-build //编译
-python push.py  //将injectSo push 到/data/local/tmp目录下
-```
+  ```c
+  ndk-build //编译
+  python push.py  //将injectSo push 到/data/local/tmp目录下
+  ```
 
 
 * 运行
 
 
 1. 运行target：在任意终端下输入如下命令：
-```c
-adb shell ./data/local/tmp/target
-```
+  ```c
+  adb shell ./data/local/tmp/target
+  ```
   得到如下结果:
 
   ![e3_r_before_injection](https://github.com/ManyFace/AndroidInjection/blob/master/images/3/2.PNG "e3_r_before_injection")
 * 通过adb shell ps命令找到target的pid，假设为1883
 * 运行injectSo：在任意终端下输入如下命令：
-```c
-adb shell ./data/local/tmp/injectSo 1883 //1883为target的pid
-```
+  ```c
+  adb shell ./data/local/tmp/injectSo 1883 //1883为target的pid
+  ```
   此时可以看到target的输出已经变化，如下所示，说明注入成功。
 
   ![e3_r_after_injection](https://github.com/ManyFace/AndroidInjection/blob/master/images/3/3.PNG "e3_r_after_injection")
