@@ -129,7 +129,7 @@ adb shell ./data/local/tmp/target
 ```
   得到如下结果:
 
-  ![e2_r_before_injection](https://github.com/ManyFace/AndroidInjection/blob/master/images/2/1.png "e2_r_before_injection")
+  ![e2_r_before_injection](https://github.com/ManyFace/AndroidInjection/blob/master/images/2/1.PNG "e2_r_before_injection")
 * 通过adb shell ps命令找到target的pid，假设为8326
 * 运行injectTarget：在任意终端下输入如下命令：
 ```c
@@ -137,7 +137,7 @@ adb shell ./data/local/tmp/injectTarget 8326 //8326为target的pid
 ```
   此时可以看到target的输出已经变化，如下所示，说明注入成功。
 
-  ![e2_r_after_injection](https://github.com/ManyFace/AndroidInjection/blob/master/images/2/3.png "e2_r_after_injection")
+  ![e2_r_after_injection](https://github.com/ManyFace/AndroidInjection/blob/master/images/2/3.PNG "e2_r_after_injection")
 
 ## exercise3-GOTHook
 **目标：**古河大大很早之前发过注入so的例子，是通过注入shellcode来实现的。本练习将那段shellcode改为c语言来实现，以方便理解，并在此基础上添加了GOT Hook的功能。
@@ -191,7 +191,7 @@ adb shell ./data/local/tmp/injectTarget 8326 //8326为target的pid
 
   在injectSo将so注入到target中后，可以通过dlsym()找到初始化函数的地址，然后设置相应的寄存器值来执行初始化函数。当然还有个相对简单的方法：在注入so中定义一个构造函数void before_main() \__attribute__((constructor))，通过IDA查看该so可以知道，before_main()函数是.init array section的一个元素，如下图所示。从而before_main()函数就会在用dlopen()加载该so的时候执行，但是before_main()不能有参数。
 
-  ![e3_init_array](https://github.com/ManyFace/AndroidInjection/blob/master/images/3/1.png "e3_init_array")
+  ![e3_init_array](https://github.com/ManyFace/AndroidInjection/blob/master/images/3/1.PNG "e3_init_array")
 * ARM状态切换
 
   ARM有两类跳转指令可以进行状态切换：BLX和BX。
@@ -234,7 +234,7 @@ adb shell ./data/local/tmp/target
 ```
   得到如下结果:
 
-  ![e3_r_before_injection](https://github.com/ManyFace/AndroidInjection/blob/master/images/3/2.png "e3_r_before_injection")
+  ![e3_r_before_injection](https://github.com/ManyFace/AndroidInjection/blob/master/images/3/2.PNG "e3_r_before_injection")
 * 通过adb shell ps命令找到target的pid，假设为1883
 * 运行injectSo：在任意终端下输入如下命令：
 ```c
@@ -242,7 +242,7 @@ adb shell ./data/local/tmp/injectSo 1883 //1883为target的pid
 ```
   此时可以看到target的输出已经变化，如下所示，说明注入成功。
 
-  ![e3_r_after_injection](https://github.com/ManyFace/AndroidInjection/blob/master/images/3/3.png "e3_r_after_injection")
+  ![e3_r_after_injection](https://github.com/ManyFace/AndroidInjection/blob/master/images/3/3.PNG "e3_r_after_injection")
 
 ## 参考
 1. http://blog.csdn.net/zhangmiaoping23/article/details/17919611
