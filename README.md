@@ -209,11 +209,13 @@ int hacked_method(int p)
 
 
 1. 在exercise3-GOTHook/target/jni目录下打开终端，输入命令：
+
   ```c
   ndk-build  // 编译
   python push.py  //将target push 到/data/local/tmp目录下
   ```
 * 在exercise3-GOTHook/libhook/jni目录下打开终端，输入命令：
+
   ```c
   ndk-build //编译
   python push.py  //将libhook.so push 到/data/local/tmp目录下
